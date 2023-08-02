@@ -394,6 +394,7 @@
   "learning.generic.upgradeNotification.pursueAverifiedCertificate": "Obtenir un certificat vérifié",
   "learning.generic.upgradeNotification.code": "Utilisez le code {code} lors du paiement",
   "learning.generic.upsell.verifiedCertBullet.verifiedCert": "attestation vérifiée",
+  "learning.generic.upsell.verifiedCertBullet.cert": "attestation",
   "learning.generic.upsell.verifiedCertBullet": "Obtenez un {verifiedCertLink} d'achèvement pour le mettre en valeur sur votre CV",
   "learning.generic.upsell.unlockGradedBullet.gradedAssignments": "évaluations notées",
   "learning.generic.upsell.unlockGradedBullet": "Déverrouillez l'accès à toutes les activités du cours, y compris {gradedAssignmentsInBoldText}",

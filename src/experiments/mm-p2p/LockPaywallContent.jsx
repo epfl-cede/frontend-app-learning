@@ -30,7 +30,7 @@ const LockPaywallContent = ({ options }) => (
         </span>
         &nbsp;
         <a className="lock_paywall_upgrade_link" href={options.access.upgradeUrl}>
-          { options.meta.gradedLock ? 'Upgrade to unlock ' : 'upgrade to a verified certificate.' }
+          { options.meta.gradedLock ? 'Upgrade to unlock ' : 'upgrade to a certificate.' }
           ({options.access.price})
         </a>
       </p>

@@ -64,7 +64,7 @@ export default function DateSummary({
             </div>
           </div>
           <div className="date-summary-text mt-1">
-            You are still eligible to upgrade to a Verified Certificate!
+            You are still eligible to upgrade to a Certificate!
             &nbsp; Unlock full course access and highlight the knowledge you&apos;ll gain.
           </div>
         </div>

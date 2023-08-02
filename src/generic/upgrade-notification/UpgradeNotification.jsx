@@ -77,7 +77,7 @@ function UpsellFBESoonCardContent({ accessExpirationDate, timezoneFormatArgs }) 
       <p>
         <FormattedMessage
           id="learning.generic.upgradeNotification.expirationVerifiedCert"
-          defaultMessage="Upgrading your course enables you to pursue a verified certificate and unlocks numerous features. Learn more about the {benefitsOfUpgrading}."
+          defaultMessage="Upgrading your course enables you to pursue a certificate and unlocks numerous features. Learn more about the {benefitsOfUpgrading}."
           values={{ benefitsOfUpgrading }}
         />
       </p>
@@ -443,7 +443,7 @@ function UpgradeNotification({
     upgradeNotificationHeaderText = (
       <FormattedMessage
         id="learning.generic.upgradeNotification.pursueAverifiedCertificate"
-        defaultMessage="Pursue a verified certificate"
+        defaultMessage="Pursue a certificate"
       />
     );
     upsellMessage = (<UpsellNoFBECardContent />);

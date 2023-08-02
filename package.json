@@ -30,8 +30,8 @@
   },
   "dependencies": {
     "@edx/brand": "npm:@edx/brand-openedx@1.1.0",
-    "@edx/frontend-component-footer": "11.1.0",
-    "@edx/frontend-component-header": "3.1.0",
+    "@edx/frontend-component-footer": "https://github.com/epfl-cede/frontend-component-footer/raw/epfl/frontend-component-footer-11.1.0-epfl1.tgz",
+    "@edx/frontend-component-header": "https://github.com/epfl-cede/frontend-component-header/raw/epfl/frontend-component-header-3.1.0-epfl6.tgz",
     "@edx/frontend-lib-special-exams": "2.1.0",
     "@edx/frontend-platform": "2.5.1",
     "@edx/paragon": "19.18.3",

@@ -171,7 +171,7 @@ const messages = defineMessages({
   },
   upgradeTitle: {
     id: 'learning.outline.upgradeTitle',
-    defaultMessage: 'Pursue a verified certificate',
+    defaultMessage: 'Pursue a certificate',
     description: 'Upgrade title',
   },
   welcomeMessage: {

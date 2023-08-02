@@ -111,7 +111,7 @@ function Day({
               { mmp2pOverride
                 ? (
                   <div className="small mb-2">
-                    You are still eligible to upgrade to a Verified Certificate!
+                    You are still eligible to upgrade to a Certificate!
                     &nbsp; Unlock full course access and highlight the knowledge you&apos;ll gain.
                   </div>
                 )

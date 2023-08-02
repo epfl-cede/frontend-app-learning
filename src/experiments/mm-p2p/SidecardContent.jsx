@@ -79,7 +79,7 @@ const Sidecard = ({
         target="_blank"
         rel="noopener noreferrer"
       >
-        verified certificate
+        certificate
       </a>
     </span>
   );

@@ -136,11 +136,11 @@
               "complete": null,
               "date": "2013-02-05T05:00:00Z",
               "date_type": "verified-upgrade-deadline",
-              "description": "You are still eligible to upgrade to a Verified Certificate! Pursue it to highlight the knowledge and skills you gain in this course.",
+              "description": "You are still eligible to upgrade to a Certificate! Pursue it to highlight the knowledge and skills you gain in this course.",
               "learner_has_access": true,
               "link": "http://localhost:18130/basket/add/?sku=8CF08E5",
-              "link_text": "Upgrade to Verified Certificate",
-              "title": "Verification Upgrade Deadline",
+              "link_text": "Upgrade to Certificate",
+              "title": "Upgrade Deadline",
               "extra_info": null,
               "first_component_block_id": ""
             }

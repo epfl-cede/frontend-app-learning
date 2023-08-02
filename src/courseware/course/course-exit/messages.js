@@ -38,7 +38,7 @@ const messages = defineMessages({
   },
   certificateHeaderUpgradable: {
     id: 'courseCelebration.certificateHeader.upgradable',
-    defaultMessage: 'Upgrade to pursue a verified certificate',
+    defaultMessage: 'Upgrade to pursue a certificate',
     description: 'Header when learner finished or pass the course but need to upgrade to get a certificate',
   },
   certificateImage: {
@@ -171,8 +171,8 @@ const messages = defineMessages({
   },
   verifiedCertificateSupportLink: {
     id: 'courseExit.verifiedCertificateSupportLink',
-    defaultMessage: 'Learn more about verified certificates',
-    description: 'Anchor text for link that redirect to external help page about verified certificates',
+    defaultMessage: 'Learn more about certificates',
+    description: 'Anchor text for link that redirect to external help page about certificates',
   },
   verifyIdentityButton: {
     id: 'courseCelebration.verifyIdentityButton',

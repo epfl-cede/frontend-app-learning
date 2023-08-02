@@ -13,11 +13,11 @@ function CheckmarkBullet() {
 // Must be child of a <ul className="fa-ul">
 export function VerifiedCertBullet() {
   const verifiedCertLink = (
-    <a className="inline-link-underline font-weight-bold" rel="noopener noreferrer" target="_blank" href={`${getConfig().MARKETING_SITE_BASE_URL}/verified-certificate`}>
+    <a className="inline-link-underline font-weight-bold" rel="noopener noreferrer" target="_blank" href={`${getConfig().MARKETING_SITE_BASE_URL}/certificate`}>
       <FormattedMessage
-        id="learning.generic.upsell.verifiedCertBullet.verifiedCert"
-        defaultMessage="verified certificate"
-        description="Bolded words 'verified certificate', which is the name of credential the learner receives."
+        id="learning.generic.upsell.verifiedCertBullet.cert"
+        defaultMessage="certificate"
+        description="Bolded word 'certificate', which is the name of credential the learner receives."
       />
     </a>
   );
