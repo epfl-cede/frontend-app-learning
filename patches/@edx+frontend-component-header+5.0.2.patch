@@ -1,0 +1,214 @@
+diff --git a/node_modules/@edx/frontend-component-header/dist/DesktopHeader.js b/node_modules/@edx/frontend-component-header/dist/DesktopHeader.js
+index b5d0ab7..a9b90f0 100644
+--- a/node_modules/@edx/frontend-component-header/dist/DesktopHeader.js
++++ b/node_modules/@edx/frontend-component-header/dist/DesktopHeader.js
+@@ -112,6 +112,7 @@ var DesktopHeader = /*#__PURE__*/function (_React$Component) {
+         userMenu = _this$props.userMenu,
+         avatar = _this$props.avatar,
+         username = _this$props.username,
++        name = _this$props.name,
+         intl = _this$props.intl;
+       return /*#__PURE__*/React.createElement(Menu, {
+         transitionClassName: "menu-dropdown",
+@@ -119,7 +120,7 @@ var DesktopHeader = /*#__PURE__*/function (_React$Component) {
+       }, /*#__PURE__*/React.createElement(MenuTrigger, {
+         tag: "button",
+         "aria-label": intl.formatMessage(messages['header.label.account.menu.for'], {
+-          username: username
++          name: name
+         }),
+         className: "btn btn-outline-primary d-inline-flex align-items-center pl-2 pr-3"
+       }, /*#__PURE__*/React.createElement(Avatar, {
+@@ -127,7 +128,7 @@ var DesktopHeader = /*#__PURE__*/function (_React$Component) {
+         src: avatar,
+         alt: "",
+         className: "mr-2"
+-      }), username, " ", /*#__PURE__*/React.createElement(CaretIcon, {
++      }), name, " ", /*#__PURE__*/React.createElement(CaretIcon, {
+         role: "img",
+         "aria-hidden": true,
+         focusable: "false"
+@@ -218,6 +219,7 @@ DesktopHeader.propTypes = {
+   logoDestination: PropTypes.string,
+   avatar: PropTypes.string,
+   username: PropTypes.string,
++  name: PropTypes.string,
+   loggedIn: PropTypes.bool,
+   // i18n
+   intl: intlShape.isRequired,
+@@ -240,6 +242,7 @@ DesktopHeader.defaultProps = {
+   logoDestination: null,
+   avatar: null,
+   username: null,
++  name: null,
+   loggedIn: false,
+   appMenu: null
+ };
+diff --git a/node_modules/@edx/frontend-component-header/dist/Header.js b/node_modules/@edx/frontend-component-header/dist/Header.js
+index aa00654..2925489 100644
+--- a/node_modules/@edx/frontend-component-header/dist/Header.js
++++ b/node_modules/@edx/frontend-component-header/dist/Header.js
+@@ -6,7 +6,7 @@ import { APP_CONFIG_INITIALIZED, ensureConfig, mergeConfig, getConfig, subscribe
+ import DesktopHeader from './DesktopHeader';
+ import MobileHeader from './MobileHeader';
+ import messages from './Header.messages';
+-ensureConfig(['LMS_BASE_URL', 'LOGOUT_URL', 'LOGIN_URL', 'SITE_NAME', 'LOGO_URL', 'ORDER_HISTORY_URL'], 'Header component');
++ensureConfig(['LMS_BASE_URL', 'CATALOG_BASE_URL', 'CATALOG_ORGANIZATION_NAME', 'LOGOUT_URL', 'LOGIN_URL', 'SITE_NAME', 'LOGO_URL', 'ORDER_HISTORY_URL'], 'Header component');
+ subscribe(APP_CONFIG_INITIALIZED, function () {
+   mergeConfig({
+     AUTHN_MINIMAL_HEADER: !!process.env.AUTHN_MINIMAL_HEADER
+@@ -17,11 +17,22 @@ var Header = function Header(_ref) {
+   var _useContext = useContext(AppContext),
+     authenticatedUser = _useContext.authenticatedUser,
+     config = _useContext.config;
+-  var mainMenu = [{
++  var mainMenu = config.CATALOG_BASE_URL === undefined ? [{
+     type: 'item',
+     href: "".concat(config.LMS_BASE_URL, "/dashboard"),
+     content: intl.formatMessage(messages['header.links.courses'])
++  }] : [{
++    type: 'item',
++    href: "".concat(config.CATALOG_BASE_URL, "/courses/"),
++    content: intl.formatMessage(messages['header.links.courses.all'])
+   }];
++  if (config.CATALOG_BASE_URL !== undefined && authenticatedUser !== null) {
++    mainMenu.unshift({
++      type: 'item',
++      href: "".concat(config.CATALOG_BASE_URL, "/dashboard/"),
++      content: intl.formatMessage(messages['header.links.courses.my'])
++    });
++  }
+   var orderHistoryItem = {
+     type: 'item',
+     href: config.ORDER_HISTORY_URL,
+@@ -29,7 +40,7 @@ var Header = function Header(_ref) {
+   };
+   var userMenu = authenticatedUser === null ? [] : [{
+     type: 'item',
+-    href: "".concat(config.LMS_BASE_URL, "/dashboard"),
++    href: "".concat(config.CATALOG_BASE_URL, "/dashboard/"),
+     content: intl.formatMessage(messages['header.user.menu.dashboard'])
+   }, {
+     type: 'item',
+@@ -52,18 +63,21 @@ var Header = function Header(_ref) {
+   var loggedOutItems = [{
+     type: 'item',
+     href: config.LOGIN_URL,
+-    content: intl.formatMessage(messages['header.user.menu.login'])
+-  }, {
++    content: intl.formatMessage(messages['header.user.menu.signin'])
++  }
++  /*{
+     type: 'item',
+-    href: "".concat(config.LMS_BASE_URL, "/register"),
+-    content: intl.formatMessage(messages['header.user.menu.register'])
+-  }];
++    href: `${config.LMS_BASE_URL}/register`,
++    content: intl.formatMessage(messages['header.user.menu.register']),
++  },*/];
++
+   var props = {
+     logo: config.LOGO_URL,
+     logoAltText: config.SITE_NAME,
+     logoDestination: "".concat(config.LMS_BASE_URL, "/dashboard"),
+     loggedIn: authenticatedUser !== null,
+     username: authenticatedUser !== null ? authenticatedUser.username : null,
++    name: authenticatedUser !== null ? authenticatedUser.name : null,
+     avatar: authenticatedUser !== null ? authenticatedUser.avatar : null,
+     mainMenu: getConfig().AUTHN_MINIMAL_HEADER ? [] : mainMenu,
+     userMenu: getConfig().AUTHN_MINIMAL_HEADER ? [] : userMenu,
+diff --git a/node_modules/@edx/frontend-component-header/dist/Header.messages.js b/node_modules/@edx/frontend-component-header/dist/Header.messages.js
+index 4aac3e8..090dae9 100644
+--- a/node_modules/@edx/frontend-component-header/dist/Header.messages.js
++++ b/node_modules/@edx/frontend-component-header/dist/Header.messages.js
+@@ -5,6 +5,16 @@ var messages = defineMessages({
+     defaultMessage: 'Courses',
+     description: 'Link to the learner course dashboard'
+   },
++  'header.links.courses.all': {
++    id: 'header.links.courses.all',
++    defaultMessage: 'All courses',
++    description: 'Link to catalog SMS courses'
++  },
++  'header.links.courses.my': {
++    id: 'header.links.courses.my',
++    defaultMessage: 'My courses',
++    description: 'Link to catalog my courses'
++  },
+   'header.links.programs': {
+     id: 'header.links.programs',
+     defaultMessage: 'Programs',
+@@ -50,6 +60,16 @@ var messages = defineMessages({
+     defaultMessage: 'Login',
+     description: 'Login link'
+   },
++  'header.user.menu.signin': {
++    id: 'header.user.menu.signin',
++    defaultMessage: 'Signin',
++    description: 'Sign link'
++  },
++  'header.user.menu.help': {
++    id: 'header.user.menu.help',
++    defaultMessage: 'Help',
++    description: 'Help link'
++  },
+   'header.user.menu.register': {
+     id: 'header.user.menu.register',
+     defaultMessage: 'Sign Up',
+@@ -77,7 +97,7 @@ var messages = defineMessages({
+   },
+   'header.label.account.menu.for': {
+     id: 'header.label.account.menu.for',
+-    defaultMessage: 'Account menu for {username}',
++    defaultMessage: 'Account menu for {user}',
+     description: 'The aria label for the account menu trigger when the username is displayed in it'
+   },
+   'header.label.main.nav': {
+diff --git a/node_modules/@edx/frontend-component-header/dist/learning-header/AuthenticatedUserDropdown.js b/node_modules/@edx/frontend-component-header/dist/learning-header/AuthenticatedUserDropdown.js
+index a3ab0bc..f40a237 100644
+--- a/node_modules/@edx/frontend-component-header/dist/learning-header/AuthenticatedUserDropdown.js
++++ b/node_modules/@edx/frontend-component-header/dist/learning-header/AuthenticatedUserDropdown.js
+@@ -8,7 +8,8 @@ import { Dropdown } from '@openedx/paragon';
+ import messages from './messages';
+ var AuthenticatedUserDropdown = function AuthenticatedUserDropdown(_ref) {
+   var intl = _ref.intl,
+-    username = _ref.username;
++    username = _ref.username,
++    name = _ref.name;
+   var dashboardMenuItem = /*#__PURE__*/React.createElement(Dropdown.Item, {
+     href: "".concat(getConfig().LMS_BASE_URL, "/dashboard")
+   }, intl.formatMessage(messages.dashboard));
+@@ -26,7 +27,7 @@ var AuthenticatedUserDropdown = function AuthenticatedUserDropdown(_ref) {
+   }), /*#__PURE__*/React.createElement("span", {
+     "data-hj-suppress": true,
+     className: "d-none d-md-inline"
+-  }, username)), /*#__PURE__*/React.createElement(Dropdown.Menu, {
++  }, name)), /*#__PURE__*/React.createElement(Dropdown.Menu, {
+     className: "dropdown-menu-right"
+   }, dashboardMenuItem, /*#__PURE__*/React.createElement(Dropdown.Item, {
+     href: "".concat(getConfig().ACCOUNT_PROFILE_URL, "/u/").concat(username)
+@@ -40,7 +41,8 @@ var AuthenticatedUserDropdown = function AuthenticatedUserDropdown(_ref) {
+ };
+ AuthenticatedUserDropdown.propTypes = {
+   intl: intlShape.isRequired,
+-  username: PropTypes.string.isRequired
++  username: PropTypes.string.isRequired,
++  name: PropTypes.string.isRequired
+ };
+ export default injectIntl(AuthenticatedUserDropdown);
+ //# sourceMappingURL=AuthenticatedUserDropdown.js.map
+\ No newline at end of file
+diff --git a/node_modules/@edx/frontend-component-header/dist/learning-header/LearningHeader.js b/node_modules/@edx/frontend-component-header/dist/learning-header/LearningHeader.js
+index bbdf3a5..3a14514 100644
+--- a/node_modules/@edx/frontend-component-header/dist/learning-header/LearningHeader.js
++++ b/node_modules/@edx/frontend-component-header/dist/learning-header/LearningHeader.js
+@@ -59,7 +59,8 @@ var LearningHeader = function LearningHeader(_ref2) {
+   }, courseOrg, " ", courseNumber), /*#__PURE__*/React.createElement("span", {
+     className: "d-block m-0 font-weight-bold course-title"
+   }, courseTitle)), showUserDropdown && authenticatedUser && /*#__PURE__*/React.createElement(AuthenticatedUserDropdown, {
+-    username: authenticatedUser.username
++    username: authenticatedUser.username,
++    name: authenticatedUser.name
+   }), showUserDropdown && !authenticatedUser && /*#__PURE__*/React.createElement(AnonymousUserMenu, null)));
+ };
+ LearningHeader.propTypes = {

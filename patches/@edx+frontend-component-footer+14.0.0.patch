@@ -1,0 +1,101 @@
+diff --git a/node_modules/@edx/frontend-component-footer/dist/components/Footer.js b/node_modules/@edx/frontend-component-footer/dist/components/Footer.js
+index b213b50..5c99d7d 100644
+--- a/node_modules/@edx/frontend-component-footer/dist/components/Footer.js
++++ b/node_modules/@edx/frontend-component-footer/dist/components/Footer.js
+@@ -54,12 +54,42 @@ var SiteFooter = /*#__PURE__*/function (_React$Component) {
+         intl = _this$props.intl;
+       var showLanguageSelector = supportedLanguages.length > 0 && onLanguageSelected;
+       var config = this.context.config;
++      if (config.CATALOG_BASE_URL) {
++        var tos_url = "".concat(config.CATALOG_BASE_URL, "general-terms-and-conditions/");
++        var privacy_url = "".concat(config.CATALOG_BASE_URL, "privacy-policy/");
++      } else {
++        var tos_url = "https://swissmooc.ch/general-terms-and-conditions/";
++        var privacy_url = "https://swissmooc.ch/privacy-policy/";
++      }
+       return /*#__PURE__*/React.createElement("footer", {
+         role: "contentinfo",
+         className: "footer d-flex border-top py-3 px-4"
+       }, /*#__PURE__*/React.createElement("div", {
+         className: "container-fluid d-flex"
++      }, /*#__PURE__*/React.createElement("ul", {
++        className: "list-unstyled"
++      }, /*#__PURE__*/React.createElement("li", null, showLanguageSelector && /*#__PURE__*/React.createElement(LanguageSelector, {
++        options: supportedLanguages,
++        onSubmit: onLanguageSelected
++      })), /*#__PURE__*/React.createElement("li", {
++        style: {
++          fontSize: "0.6875em"
++        },
++        className: "pt-1"
++      }, "\xA9 ", config.SITE_NAME, ". All rights reserved except where noted.  edX, Open edX and their respective logos are registered trademarks of edX Inc."), /*#__PURE__*/React.createElement("li", {
++        style: {
++          fontSize: "0.6875em"
++        },
++        className: "pt-1"
+       }, /*#__PURE__*/React.createElement("a", {
++        className: "text-primary-500 mr-1",
++        href: tos_url
++      }, intl.formatMessage(messages['footer.catalogLinks.tos'])), /*#__PURE__*/React.createElement("a", {
++        className: "text-primary-500 ml-1",
++        href: privacy_url
++      }, intl.formatMessage(messages['footer.catalogLinks.privacy'])))), /*#__PURE__*/React.createElement("div", {
++        className: "flex-grow-1"
++      }), /*#__PURE__*/React.createElement("a", {
+         className: "d-block",
+         href: config.LMS_BASE_URL,
+         "aria-label": intl.formatMessage(messages['footer.logo.ariaLabel'])
+@@ -69,12 +99,7 @@ var SiteFooter = /*#__PURE__*/function (_React$Component) {
+         },
+         src: logo || config.LOGO_TRADEMARK_URL,
+         alt: intl.formatMessage(messages['footer.logo.altText'])
+-      })), /*#__PURE__*/React.createElement("div", {
+-        className: "flex-grow-1"
+-      }), showLanguageSelector && /*#__PURE__*/React.createElement(LanguageSelector, {
+-        options: supportedLanguages,
+-        onSubmit: onLanguageSelected
+-      })));
++      }))));
+     }
+   }]);
+   return SiteFooter;
+diff --git a/node_modules/@edx/frontend-component-footer/dist/components/Footer.messages.js b/node_modules/@edx/frontend-component-footer/dist/components/Footer.messages.js
+index da4ff23..80b7353 100644
+--- a/node_modules/@edx/frontend-component-footer/dist/components/Footer.messages.js
++++ b/node_modules/@edx/frontend-component-footer/dist/components/Footer.messages.js
+@@ -1,5 +1,15 @@
+ import { defineMessages } from '@edx/frontend-platform/i18n';
+ var messages = defineMessages({
++  'footer.catalogLinks.tos': {
++    id: 'footer.catalogLinks.tos',
++    defaultMessage: 'Terms of Service & Honor Code',
++    description: 'This is screenreader text for the Catalog Terms of Service policy.'
++  },
++  'footer.catalogLinks.privacy': {
++    id: 'footer.catalogLinks.privacy',
++    defaultMessage: 'Privacy Policy',
++    description: 'This is screenreader text for the Catalog Privacy policy URL.'
++  },
+   'footer.socialLinks.srText.facebook': {
+     id: 'footer.socialLinks.srText.facebook',
+     defaultMessage: 'Like edX on Facebook',
+diff --git a/node_modules/@edx/frontend-component-footer/dist/components/LanguageSelector.js b/node_modules/@edx/frontend-component-footer/dist/components/LanguageSelector.js
+index 85a14c9..de7ec65 100644
+--- a/node_modules/@edx/frontend-component-footer/dist/components/LanguageSelector.js
++++ b/node_modules/@edx/frontend-component-footer/dist/components/LanguageSelector.js
+@@ -20,14 +20,7 @@ var LanguageSelector = function LanguageSelector(_ref) {
+     onSubmit: handleSubmit
+   }, props), /*#__PURE__*/React.createElement("div", {
+     className: "form-group"
+-  }, /*#__PURE__*/React.createElement("label", {
+-    htmlFor: "site-footer-language-select",
+-    className: "d-inline-block m-0"
+-  }, /*#__PURE__*/React.createElement(FormattedMessage, {
+-    id: "footer.languageForm.select.label",
+-    defaultMessage: "Choose Language",
+-    description: "The label for the laguage select part of the language selection form."
+-  })), /*#__PURE__*/React.createElement("select", {
++  }, /*#__PURE__*/React.createElement("select", {
+     id: "site-footer-language-select",
+     className: "form-control-sm mx-2",
+     name: "site-footer-language-select",
