@@ -1,0 +1,235 @@
+diff --git a/node_modules/@edx/frontend-component-header/dist/Header.js b/node_modules/@edx/frontend-component-header/dist/Header.js
+index 4a1ad7c..9f83b8f 100644
+--- a/node_modules/@edx/frontend-component-header/dist/Header.js
++++ b/node_modules/@edx/frontend-component-header/dist/Header.js
+@@ -13,7 +13,7 @@ import PropTypes from 'prop-types';
+ import DesktopHeaderSlot from './plugin-slots/DesktopHeaderSlot';
+ import MobileHeaderSlot from './plugin-slots/MobileHeaderSlot';
+ import messages from './Header.messages';
+-ensureConfig(['LMS_BASE_URL', 'LOGOUT_URL', 'LOGIN_URL', 'SITE_NAME', 'LOGO_URL', 'ORDER_HISTORY_URL'], 'Header component');
++ensureConfig(['LMS_BASE_URL', 'CATALOG_BASE_URL', 'CATALOG_ORGANIZATION_NAME', 'LOGOUT_URL', 'LOGIN_URL', 'SITE_NAME', 'LOGO_URL', 'ORDER_HISTORY_URL'], 'Header component');
+ subscribe(APP_CONFIG_INITIALIZED, function () {
+   mergeConfig({
+     AUTHN_MINIMAL_HEADER: !!process.env.AUTHN_MINIMAL_HEADER
+@@ -43,16 +43,27 @@ var Header = function Header(_ref) {
+   var _useContext = useContext(AppContext),
+     authenticatedUser = _useContext.authenticatedUser,
+     config = _useContext.config;
+-  var defaultMainMenu = [{
++  var defaultMainMenu = config.CATALOG_BASE_URL === undefined ? [{
+     type: 'item',
+     href: "".concat(config.LMS_BASE_URL, "/dashboard"),
+     content: intl.formatMessage(messages['header.links.courses'])
++  }] : [{
++    type: 'item',
++    href: "".concat(config.CATALOG_BASE_URL, "/courses/"),
++    content: intl.formatMessage(messages['header.links.courses.all'])
+   }];
++  if (config.CATALOG_BASE_URL !== undefined && authenticatedUser !== null) {
++    defaultMainMenu.unshift({
++      type: 'item',
++      href: "".concat(config.CATALOG_BASE_URL, "/dashboard/"),
++      content: intl.formatMessage(messages['header.links.courses.my'])
++    });
++  }
+   var defaultUserMenu = authenticatedUser === null ? [] : [{
+     heading: '',
+     items: [{
+       type: 'item',
+-      href: "".concat(config.LMS_BASE_URL, "/dashboard"),
++      href: config.CATALOG_BASE_URL ? "".concat(config.CATALOG_BASE_URL, "/dashboard/") : "".concat(config.LMS_BASE_URL, "/dashboard"),
+       content: intl.formatMessage(messages['header.user.menu.dashboard'])
+     }, {
+       type: 'item',
+@@ -78,18 +89,22 @@ var Header = function Header(_ref) {
+   var loggedOutItems = [{
+     type: 'item',
+     href: config.LOGIN_URL,
+-    content: intl.formatMessage(messages['header.user.menu.login'])
+-  }, {
++    content: intl.formatMessage(messages['header.user.menu.signin'])
++  }
++  /*
++  {
+     type: 'item',
+-    href: "".concat(config.LMS_BASE_URL, "/register"),
+-    content: intl.formatMessage(messages['header.user.menu.register'])
+-  }];
++    href: `${config.LMS_BASE_URL}/register`,
++    content: intl.formatMessage(messages['header.user.menu.register']),
++  },
++  */];
+   var props = {
+     logo: config.LOGO_URL,
+     logoAltText: config.SITE_NAME,
+     logoDestination: "".concat(config.LMS_BASE_URL, "/dashboard"),
+     loggedIn: authenticatedUser !== null,
+     username: authenticatedUser !== null ? authenticatedUser.username : null,
++    name: authenticatedUser !== null ? authenticatedUser.name : null,
+     avatar: authenticatedUser !== null ? authenticatedUser.avatar : null,
+     mainMenu: getConfig().AUTHN_MINIMAL_HEADER ? [] : mainMenu,
+     secondaryMenu: getConfig().AUTHN_MINIMAL_HEADER ? [] : secondaryMenu,
+diff --git a/node_modules/@edx/frontend-component-header/dist/Header.messages.js b/node_modules/@edx/frontend-component-header/dist/Header.messages.js
+index 3fc99ce..a7ac4bf 100644
+--- a/node_modules/@edx/frontend-component-header/dist/Header.messages.js
++++ b/node_modules/@edx/frontend-component-header/dist/Header.messages.js
+@@ -5,6 +5,16 @@ var messages = defineMessages({
+     defaultMessage: 'Courses',
+     description: 'Link to the learner course dashboard'
+   },
++  'header.links.courses.all': {
++    id: 'header.links.courses.all',
++    defaultMessage: 'All courses',
++    description: 'Link to catalog SMS courses'
++  },
++  'header.links.courses.my': {
++    id: 'header.links.courses.my',
++    defaultMessage: 'My courses',
++    description: 'Link to catalog my courses'
++  },
+   'header.links.programs': {
+     id: 'header.links.programs',
+     defaultMessage: 'Programs',
+@@ -50,6 +60,16 @@ var messages = defineMessages({
+     defaultMessage: 'Login',
+     description: 'Login link'
+   },
++  'header.user.menu.signin': {
++    id: 'header.user.menu.signin',
++    defaultMessage: 'Signin',
++    description: 'Sign link'
++  },
++  'header.user.menu.help': {
++    id: 'header.user.menu.help',
++    defaultMessage: 'Help',
++    description: 'Help link'
++  },
+   'header.user.menu.register': {
+     id: 'header.user.menu.register',
+     defaultMessage: 'Sign Up',
+@@ -72,7 +92,7 @@ var messages = defineMessages({
+   },
+   'header.label.account.menu.for': {
+     id: 'header.label.account.menu.for',
+-    defaultMessage: 'Account menu for {username}',
++    defaultMessage: 'Account menu for {user}',
+     description: 'The aria label for the account menu trigger when the username is displayed in it'
+   },
+   'header.label.main.nav': {
+diff --git a/node_modules/@edx/frontend-component-header/dist/desktop-header/DesktopHeader.js b/node_modules/@edx/frontend-component-header/dist/desktop-header/DesktopHeader.js
+index d1acc91..9991fe2 100644
+--- a/node_modules/@edx/frontend-component-header/dist/desktop-header/DesktopHeader.js
++++ b/node_modules/@edx/frontend-component-header/dist/desktop-header/DesktopHeader.js
+@@ -63,6 +63,7 @@ var DesktopHeader = /*#__PURE__*/function (_React$Component) {
+         userMenu = _this$props.userMenu,
+         avatar = _this$props.avatar,
+         username = _this$props.username,
++        name = _this$props.name,
+         intl = _this$props.intl;
+       return /*#__PURE__*/React.createElement(Menu, {
+         transitionClassName: "menu-dropdown",
+@@ -70,7 +71,7 @@ var DesktopHeader = /*#__PURE__*/function (_React$Component) {
+       }, /*#__PURE__*/React.createElement(MenuTrigger, {
+         tag: "button",
+         "aria-label": intl.formatMessage(messages['header.label.account.menu.for'], {
+-          username: username
++          user: name
+         }),
+         className: "btn btn-outline-primary d-inline-flex align-items-center pl-2 pr-3"
+       }, /*#__PURE__*/React.createElement(Avatar, {
+@@ -78,7 +79,7 @@ var DesktopHeader = /*#__PURE__*/function (_React$Component) {
+         src: avatar,
+         alt: "",
+         className: "mr-2"
+-      }), username, " ", /*#__PURE__*/React.createElement(CaretIcon, {
++      }), name, " ", /*#__PURE__*/React.createElement(CaretIcon, {
+         role: "img",
+         "aria-hidden": true,
+         focusable: "false"
+@@ -140,19 +141,21 @@ export var desktopHeaderDataShape = {
+   logoDestination: PropTypes.string,
+   avatar: PropTypes.string,
+   username: PropTypes.string,
++  name: PropTypes.string,
+   loggedIn: PropTypes.bool
+ };
+ DesktopHeader.propTypes = {
+   mainMenu: desktopHeaderDataShape.mainMenu,
+-  secondaryMenu: desktopHeaderDataShape.secondaryMenumainMenu,
+-  userMenu: desktopHeaderDataShape.userMenumainMenu,
+-  loggedOutItems: desktopHeaderDataShape.loggedOutItemsmainMenu,
+-  logo: desktopHeaderDataShape.logomainMenu,
+-  logoAltText: desktopHeaderDataShape.logoAltTextmainMenu,
+-  logoDestination: desktopHeaderDataShape.logoDestinationmainMenu,
+-  avatar: desktopHeaderDataShape.avatarmainMenu,
+-  username: desktopHeaderDataShape.usernamemainMenu,
+-  loggedIn: desktopHeaderDataShape.loggedInmainMenu,
++  secondaryMenu: desktopHeaderDataShape.secondaryMenu,
++  userMenu: desktopHeaderDataShape.userMenu,
++  loggedOutItems: desktopHeaderDataShape.loggedOutItems,
++  logo: desktopHeaderDataShape.logo,
++  logoAltText: desktopHeaderDataShape.logoAltText,
++  logoDestination: desktopHeaderDataShape.logoDestination,
++  avatar: desktopHeaderDataShape.avatar,
++  username: desktopHeaderDataShape.username,
++  name: desktopHeaderDataShape.name,
++  loggedIn: desktopHeaderDataShape.loggedIn,
+   // i18n
+   intl: intlShape.isRequired
+ };
+@@ -166,6 +169,7 @@ DesktopHeader.defaultProps = {
+   logoDestination: null,
+   avatar: null,
+   username: null,
++  name: null,
+   loggedIn: false
+ };
+ export default injectIntl(DesktopHeader);
+diff --git a/node_modules/@edx/frontend-component-header/dist/learning-header/AuthenticatedUserDropdown.js b/node_modules/@edx/frontend-component-header/dist/learning-header/AuthenticatedUserDropdown.js
+index dff503a..9546f90 100644
+--- a/node_modules/@edx/frontend-component-header/dist/learning-header/AuthenticatedUserDropdown.js
++++ b/node_modules/@edx/frontend-component-header/dist/learning-header/AuthenticatedUserDropdown.js
+@@ -15,7 +15,8 @@ import LearningUserMenuSlot from '../plugin-slots/LearningUserMenuSlot';
+ import messages from './messages';
+ var AuthenticatedUserDropdown = function AuthenticatedUserDropdown(_ref) {
+   var intl = _ref.intl,
+-    username = _ref.username;
++    username = _ref.username,
++    name = _ref.name;
+   var dropdownItems = [{
+     message: intl.formatMessage(messages.dashboard),
+     href: "".concat(getConfig().LMS_BASE_URL, "/dashboard")
+@@ -43,7 +44,7 @@ var AuthenticatedUserDropdown = function AuthenticatedUserDropdown(_ref) {
+   }), /*#__PURE__*/React.createElement("span", {
+     "data-hj-suppress": true,
+     className: "d-none d-md-inline"
+-  }, username)), /*#__PURE__*/React.createElement(Dropdown.Menu, {
++  }, name)), /*#__PURE__*/React.createElement(Dropdown.Menu, {
+     className: "dropdown-menu-right"
+   }, /*#__PURE__*/React.createElement(LearningUserMenuSlot, {
+     items: dropdownItems
+@@ -51,7 +52,8 @@ var AuthenticatedUserDropdown = function AuthenticatedUserDropdown(_ref) {
+ };
+ AuthenticatedUserDropdown.propTypes = {
+   intl: intlShape.isRequired,
+-  username: PropTypes.string.isRequired
++  username: PropTypes.string.isRequired,
++  name: PropTypes.string.isRequired
+ };
+ export default injectIntl(AuthenticatedUserDropdown);
+ //# sourceMappingURL=AuthenticatedUserDropdown.js.map
+\ No newline at end of file
+diff --git a/node_modules/@edx/frontend-component-header/dist/learning-header/LearningHeader.js b/node_modules/@edx/frontend-component-header/dist/learning-header/LearningHeader.js
+index 489266b..d4246a3 100644
+--- a/node_modules/@edx/frontend-component-header/dist/learning-header/LearningHeader.js
++++ b/node_modules/@edx/frontend-component-header/dist/learning-header/LearningHeader.js
+@@ -40,7 +40,8 @@ var LearningHeader = function LearningHeader(_ref) {
+     courseNumber: courseNumber,
+     courseTitle: courseTitle
+   })), showUserDropdown && authenticatedUser && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(LearningHelpSlot, null), /*#__PURE__*/React.createElement(AuthenticatedUserDropdown, {
+-    username: authenticatedUser.username
++    username: authenticatedUser.username,
++    name: authenticatedUser.name
+   })), showUserDropdown && !authenticatedUser && /*#__PURE__*/React.createElement(AnonymousUserMenu, null)));
+ };
+ LearningHeader.propTypes = {
